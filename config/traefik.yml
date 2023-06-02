@@ -1,0 +1,57 @@
+api:
+  insecure: false
+  dashboard: true
+
+# comentar esta sección si no se quiere SSL en local
+
+entryPoints:
+  web:
+    address: ":80"
+    # http:
+    #   redirections:
+    #     entryPoint:
+    #       to: websecurity
+    #       scheme: https
+  websecurity:
+    address: ":443"
+
+providers:
+  docker:
+    endpoint: "unix:///var/run/docker.sock" # Daemon Docker
+
+  file:
+    filename: /config.yml
+
+# comentar esta sección si no se quiere SSL en local
+certificatesResolvers:
+  myresolver:
+    acme:
+      email: "contacto@mywebsite.com"
+      storage: /acme.json
+      httpChallenge:
+        entrypoint: web
+
+# metrics:
+#   prometheus:
+#     addEntryPointsLabels: true
+#     addServicesLabels: true
+#     entryPoint: web
+
+# tracing:
+# datadog: {}
+
+#
+log:
+  filePath: "/traefik.log"
+  level: ERROR
+  format: json
+
+accessLog:
+  filePath: "/access.log"
+  bufferingSize: 100
+  filters:
+    statusCodes:
+      - "200"
+      - "300-302"
+    retryAttempts: true
+    minDuration: "10ms"
