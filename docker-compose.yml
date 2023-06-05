@@ -11,7 +11,7 @@ services:
       # login basicauth
       - "traefik.http.middlewares.auth.basicauth.removeheader=true"
       # Command -> htpasswd -nb user password | paste -s >> /path/to/file/users.txt
-      - "traefik.http.middlewares.auth.basicauth.usersfile=/users.txt"
+      - "traefik.http.middlewares.auth.basicauth.usersfile=/users.txt" # usuario:admin contaseña: 123456
       #- "traefik.http.middlewares.auth.basicauth.users=admin:{SHA}fEqNCco3Yq9h5ZUglD3CZJT4lBs="
       # http
       - "traefik.http.routers.api-http.entrypoints=http"
@@ -31,15 +31,16 @@ services:
       - 443:443 # comentar si no se quiere SSL en local
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /etc/localtime:/etc/localtime:ro
+      # - /etc/localtime:/etc/localtime # Descomentar si no se especifica la zona horario en enviroment
       - ./config/traefik.yml:/traefik.yml
-      - ./config/acme.json:/etc/traefik/acme/acme.json
+      - ./config/acme.json:/etc/traefik/acme/acme.json # chmod 600 ./config/acme.json
       - ./config/config.yml:/config.yml
-      - ./config/users.txt:/users.txt:ro
+      - ./config/users.txt:/users.txt
       - ./logs/traefik.log:/traefik.log
       - ./logs/access.log:/access.log
     networks:
       traefik_network:
+
 
 networks:
   traefik_network:
