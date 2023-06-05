@@ -1,0 +1,7 @@
+CONTAINER_NAME=whoami
+
+IMAGE_VERSION=traefik/whoami
+
+HOST_APP=whoami.app.test
+
+NETWORK_NAME=traefik_net

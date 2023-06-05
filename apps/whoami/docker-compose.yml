@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  whoami:
+    # services name (unique)
+    image: ${IMAGE_VERSION}
+    # container_name: ${CONTAINER_NAME} # Comentar esta linea si vas a usar el comando scale -> docker-compose up -d --scale whoami=3
+    labels:
+      # http
+      - "traefik.http.routers.nginx-http.entrypoints=http"
+      - "traefik.http.routers.nginx-http.rule=Host(`${HOST_APP}`)"
+      # https
+      - "traefik.http.routers.nginx.entrypoints=https"
+      - "traefik.http.routers.nginx.rule=Host(`${HOST_APP}`)"
+      - "traefik.http.routers.nginx.tls=true"
+      - "traefik.http.routers.nginx.tls.certresolver=letsencrypt"
+    networks:
+      traefik_network:
+
+
+networks:
+  traefik_network:
+    name: ${NETWORK_NAME}
+    driver: bridge
