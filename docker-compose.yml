@@ -4,6 +4,8 @@ services:
   traefik:
     # image: traefik:v2.3.6
     image: traefik:${TRAEFIK_VERSION}
+    environment:
+      - TZ=America/Mexico_City
     restart: always
     labels:
       # login basicauth
@@ -12,27 +14,27 @@ services:
       - "traefik.http.middlewares.auth.basicauth.usersfile=/users.txt"
       #- "traefik.http.middlewares.auth.basicauth.users=admin:{SHA}fEqNCco3Yq9h5ZUglD3CZJT4lBs="
       # http
-      - "traefik.http.routers.api-http.entrypoints=web"
+      - "traefik.http.routers.api-http.entrypoints=http"
       - "traefik.http.routers.api-http.middlewares=auth"
       - "traefik.http.routers.api-http.rule=Host(`${HOST_APP}`)"
       - "traefik.http.routers.api-http.service=api@internal"
-      # # https
-      # - "traefik.http.routers.api.entrypoints=websecurity"
-      # - "traefik.http.routers.api.middlewares=auth"
-      # - "traefik.http.routers.api.rule=Host(`${HOST_APP}`)"
-      # - "traefik.http.routers.api.service=api@internal"
-      # - "traefik.http.routers.api.tls=true"
-      # - "traefik.http.routers.api.tls.certresolver=myresolver"
+      # https
+      - "traefik.http.routers.api.entrypoints=https"
+      - "traefik.http.routers.api.middlewares=auth"
+      - "traefik.http.routers.api.rule=Host(`${HOST_APP}`)"
+      - "traefik.http.routers.api.service=api@internal"
+      - "traefik.http.routers.api.tls=true"
+      - "traefik.http.routers.api.tls.certresolver=letsencrypt"
     ports:
       # - 8080:8080
       - 80:80
-      # - 443:443 # comentar si no se quiere SSL en local
+      - 443:443 # comentar si no se quiere SSL en local
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /etc/localtime:/etc/localtime:ro
       - ./config/traefik.yml:/traefik.yml
       - ./config/acme.json:/etc/traefik/acme/acme.json
-      # - ./config/config.yml:/config.yml
+      - ./config/config.yml:/config.yml
       - ./config/users.txt:/users.txt:ro
       - ./logs/traefik.log:/traefik.log
       - ./logs/access.log:/access.log
@@ -41,7 +43,8 @@ services:
 
 networks:
   traefik_network:
-    name: traefik_net
+    # name: traefik_net
+    name: ${NETWORK_NAME}
     driver: bridge
     ipam:
       driver: default

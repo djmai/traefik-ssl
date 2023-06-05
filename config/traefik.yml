@@ -1,35 +1,45 @@
 api:
   insecure: false
   dashboard: true
-
-# comentar esta sección si no se quiere SSL en local
+  debug: true
 
 entryPoints:
-  web:
+  http:
     address: ":80"
-    # http:
-    #   redirections:
-    #     entryPoint:
-    #       to: websecurity
-    #       scheme: https
-  websecurity:
+    http:
+      redirections:
+        entryPoint:
+          to: https
+          scheme: https
+
+  # comentar esta sección si no se quiere SSL en local
+  https:
     address: ":443"
 
 providers:
+  # Enable Docker Provider.
   docker:
     endpoint: "unix:///var/run/docker.sock" # Daemon Docker
+  # Enable Rancher Provider.
+  # rancher:
+  #   exposedByDefault: false
+  #   defaultRule: "Host(`{{ .Name }}.{{ index .Labels \"customLabel\"}}`)"
+  #   enableServiceHealthFilter: false
+  #   refreshSeconds: 30
+  #   intervalPoll: true
+  #   prefix: "/test"
 
   file:
     filename: /config.yml
 
-# comentar esta sección si no se quiere SSL en local
+# # comentar esta sección si no se quiere SSL en local
 certificatesResolvers:
-  myresolver:
+  letsencrypt:
     acme:
       email: "contacto@mywebsite.com"
       storage: /acme.json
       httpChallenge:
-        entrypoint: web
+        entrypoint: http
 
 # metrics:
 #   prometheus:
